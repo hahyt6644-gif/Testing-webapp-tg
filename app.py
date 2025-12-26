@@ -4,8 +4,8 @@ from telebot import types
 from flask import Flask, render_template
 from threading import Thread
 
-# --- DIRECT TOKEN (NOT RECOMMENDED) ---
-TOKEN = "7487704262:AAE34XTNrKt5D9dKtduPK0Ezwc9j3SLGoBA"
+# USE YOUR NEW TOKEN HERE
+TOKEN = "7871347585:AAHAb40LW4fN3_cBRD2BD7znUYtGCkST6Qg"
 
 WEBAPP_URL = "https://testing-web-545.onrender.com/"
 
@@ -13,7 +13,7 @@ bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
 
-# /start command
+# === BOT COMMANDS ===
 @bot.message_handler(commands=['start'])
 def start(message):
     kb = types.InlineKeyboardMarkup()
@@ -30,38 +30,39 @@ def start(message):
     )
 
 
-# receives contact from WebApp popup
+# === WHEN CONTACT IS SHARED ===
 @bot.message_handler(content_types=['contact'])
 def on_contact(message):
-    contact = message.contact
+    c = message.contact
 
-    reply = (
-        "📲 Contact Shared\n\n"
-        f"👤 Name: {contact.first_name or ''} {contact.last_name or ''}\n"
-        f"📞 Phone: {contact.phone_number}\n"
-        f"🆔 Telegram ID: {message.from_user.id}\n"
-        f"🌐 Language: {message.from_user.language_code}"
+    bot.send_message(
+        message.chat.id,
+        f"📲 Contact Shared\n\n"
+        f"👤 {c.first_name or ''} {c.last_name or ''}\n"
+        f"📞 {c.phone_number}\n"
+        f"🆔 {message.from_user.id}\n"
+        f"🌐 {message.from_user.language_code}"
     )
 
-    bot.send_message(message.chat.id, reply)
 
-
-# === Flask route ===
+# === FLASK WEBAPP ===
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# run bot + flask together
+# === START BOT POLLING ===
 def run_bot():
     bot.infinity_polling(skip_pending=True)
 
 
+# === START FLASK SERVER ===
 def run_flask():
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
 
 
+# === RUN BOTH ===
 if __name__ == "__main__":
     Thread(target=run_bot).start()
-    Thread(target=run_flask).start()
+    run_flask()
