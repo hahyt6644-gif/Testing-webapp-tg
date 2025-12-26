@@ -2,51 +2,58 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Telegram WebApp Demo</title>
+  <title>Telegram WebApp</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 
 <body style="font-family: Arial; padding: 15px">
 
-  <h2>Telegram Mini App</h2>
+<h2>User Details</h2>
 
-  <div id="userBox"
-       style="padding:10px;border:1px solid #ccc;border-radius:8px;width:260px;">
-  </div>
+<div id="box"
+     style="border:1px solid #aaa;padding:10px;border-radius:10px;width:280px">
+  Waiting for contact…
+</div>
 
-  <br>
+<br>
 
-  <button id="btn"
-          style="padding:10px 15px;border-radius:8px;font-size:15px;">
-    Share Phone Number
-  </button>
+<button id="share" style="padding:10px 16px;border-radius:8px;">
+  Share Phone Number
+</button>
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-    const user = tg.initDataUnsafe?.user;
+const user = tg.initDataUnsafe?.user;
+const userId = user?.id;
 
-    // show user details on page
-    document.getElementById("userBox").innerHTML = `
-      <b>User Details</b><br><br>
-      🆔 ID: ${user?.id}<br>
-      👤 Name: ${user?.first_name || ""} ${user?.last_name || ""}<br>
-      💬 Username: @${user?.username || ""}<br>
-      🌐 Language: ${user?.language_code || ""}
+// fetch user info from backend
+async function loadData(){
+  const res = await fetch(`/api/user/${userId}`);
+  const data = await res.json();
+
+  if(data.phone){
+    document.getElementById("box").innerHTML = `
+      🆔 ID: ${userId}<br>
+      👤 Name: ${data.name}<br>
+      💬 Username: @${data.username || ""}<br>
+      🌐 Language: ${data.lang}<br>
+      📞 Phone: ${data.phone}
     `;
+  }
+}
 
-    // contact popup
-    document.getElementById("btn").onclick = function() {
-      tg.requestContact((ok) => {
-        if(ok){
-          alert("📨 Phone sent to bot");
-        } else {
-          alert("❌ Cancelled");
-        }
-      });
-    };
-  </script>
+document.getElementById("share").onclick = function(){
+  tg.requestContact((ok)=>{
+    if(ok){
+      setTimeout(loadData, 1500); // wait for bot to process
+    }
+  });
+};
+
+loadData();
+</script>
 
 </body>
 </html>
