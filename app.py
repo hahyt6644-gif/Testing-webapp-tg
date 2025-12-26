@@ -1,21 +1,19 @@
 import os
 import telebot
 from telebot import types
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, redirect, url_for
 from threading import Thread
 
-# USE YOUR NEW TOKEN HERE
 TOKEN = "7871347585:AAHAb40LW4fN3_cBRD2BD7znUYtGCkST6Qg"
 WEBAPP_URL = "https://testing-web-545.onrender.com/"
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
-# temporary memory (per user)
 user_data = {}
 
 
-# ========= BOT HANDLERS =========
+# ===== BOT =====
 @bot.message_handler(commands=['start'])
 def start(message):
     kb = types.InlineKeyboardMarkup()
@@ -25,11 +23,9 @@ def start(message):
     )
     kb.add(btn)
 
-    bot.send_message(
-        message.chat.id,
-        "👋 Open the WebApp below 👇",
-        reply_markup=kb
-    )
+    bot.send_message(message.chat.id,
+                     "👋 Open the WebApp below 👇",
+                     reply_markup=kb)
 
 
 @bot.message_handler(content_types=['contact'])
@@ -37,7 +33,6 @@ def on_contact(message):
     c = message.contact
     uid = message.from_user.id
 
-    # store data for WebApp
     user_data[uid] = {
         "name": f"{c.first_name or ''} {c.last_name or ''}".strip(),
         "phone": c.phone_number,
@@ -45,28 +40,32 @@ def on_contact(message):
         "lang": message.from_user.language_code
     }
 
-    # delete the message immediately
     try:
         bot.delete_message(message.chat.id, message.message_id)
     except:
         pass
 
 
-# ========= API (WebApp reads here) =========
+# ===== API =====
 @app.route("/api/user/<int:user_id>")
-def api_user(user_id):
+def api_get(user_id):
     return jsonify(user_data.get(user_id, {}))
 
 
-# ========= WEBAPP =========
+# ===== PAGES =====
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# ========= STARTERS =========
+@app.route("/full/<int:user_id>")
+def full_page(user_id):
+    return render_template("full.html", user_id=user_id)
+
+
+# ===== RUN =====
 def run_bot():
-    bot.remove_webhook()  # IMPORTANT: polling only
+    bot.remove_webhook()
     bot.infinity_polling(skip_pending=True)
 
 
