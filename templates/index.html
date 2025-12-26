@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Telegram WebApp Demo</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body style="font-family: Arial; padding: 15px">
+
+  <h2>Telegram Mini App</h2>
+
+  <div id="userBox"
+       style="padding:10px;border:1px solid #ccc;border-radius:8px;width:260px;">
+  </div>
+
+  <br>
+
+  <button id="btn"
+          style="padding:10px 15px;border-radius:8px;font-size:15px;">
+    Share Phone Number
+  </button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const user = tg.initDataUnsafe?.user;
+
+    // show user details on page
+    document.getElementById("userBox").innerHTML = `
+      <b>User Details</b><br><br>
+      🆔 ID: ${user?.id}<br>
+      👤 Name: ${user?.first_name || ""} ${user?.last_name || ""}<br>
+      💬 Username: @${user?.username || ""}<br>
+      🌐 Language: ${user?.language_code || ""}
+    `;
+
+    // contact popup
+    document.getElementById("btn").onclick = function() {
+      tg.requestContact((ok) => {
+        if(ok){
+          alert("📨 Phone sent to bot");
+        } else {
+          alert("❌ Cancelled");
+        }
+      });
+    };
+  </script>
+
+</body>
+</html>
