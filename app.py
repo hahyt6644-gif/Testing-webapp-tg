@@ -4,11 +4,10 @@ from telebot import types
 from flask import Flask, render_template
 from threading import Thread
 
-# --- ENV VARIABLES (Render Dashboard) ---
-# BOT_TOKEN = your bot token
-TOKEN = os.getenv("7487704262:AAE34XTNrKt5D9dKtduPK0Ezwc9j3SLGoBA")
+# --- DIRECT TOKEN (NOT RECOMMENDED) ---
+TOKEN = "7487704262:AAE34XTNrKt5D9dKtduPK0Ezwc9j3SLGoBA"
 
-WEBAPP_URL = "https://testing-web-545.onrender.com/"   # must be https
+WEBAPP_URL = "https://testing-web-545.onrender.com/"
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
@@ -31,7 +30,7 @@ def start(message):
     )
 
 
-# receives phone contact from WebApp requestContact()
+# receives contact from WebApp popup
 @bot.message_handler(content_types=['contact'])
 def on_contact(message):
     contact = message.contact
@@ -59,7 +58,7 @@ def run_bot():
 
 
 def run_flask():
-    port = int(os.environ.get("PORT", 5000))  # Render uses PORT env
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
 
 
