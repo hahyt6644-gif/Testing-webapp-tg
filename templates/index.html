@@ -8,11 +8,11 @@
 
 <body style="font-family: Arial; padding: 15px">
 
-<h2>User Details</h2>
+<h2>User</h2>
 
 <div id="box"
      style="border:1px solid #aaa;padding:10px;border-radius:10px;width:280px">
-  Waiting for phone number…
+  Loading…
 </div>
 
 <br>
@@ -28,30 +28,23 @@ tg.expand();
 const user = tg.initDataUnsafe?.user;
 const userId = user?.id;
 
-async function loadData(){
-  const res = await fetch(`/api/user/${userId}`);
-  const data = await res.json();
-
-  if(data.phone){
-    document.getElementById("box").innerHTML = `
-      🆔 ${userId}<br>
-      👤 ${data.name}<br>
-      💬 @${data.username || ""}<br>
-      🌐 ${data.lang}<br>
-      📞 ${data.phone}
-    `;
-  }
-}
+// show first details
+document.getElementById("box").innerHTML = `
+  🆔 ${userId}<br>
+  👤 ${user?.first_name || ""} ${user?.last_name || ""}<br>
+  💬 @${user?.username || ""}<br>
+  🌐 ${user?.language_code}
+`;
 
 document.getElementById("share").onclick = () => {
   tg.requestContact(ok => {
     if(ok){
-      setTimeout(loadData, 1200);
+      setTimeout(()=>{
+        window.location.href = "/full/" + userId;
+      }, 1000);
     }
   });
 };
-
-loadData();
 </script>
 
 </body>
