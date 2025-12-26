@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>User Details</title>
+</head>
+
+<body style="font-family: Arial; padding: 15px">
+
+<h2>Full Details</h2>
+
+<div id="box"
+     style="border:1px solid #aaa;padding:10px;border-radius:10px;width:280px">
+  Loading…
+</div>
+
+<script>
+const userId = {{ user_id }};
+
+async function load(){
+  const res = await fetch(`/api/user/${userId}`);
+  const data = await res.json();
+
+  if(data.phone){
+    document.getElementById("box").innerHTML = `
+      🆔 ${userId}<br>
+      👤 ${data.name}<br>
+      💬 @${data.username || ""}<br>
+      🌐 ${data.lang}<br>
+      📞 ${data.phone}
+    `;
+  } else {
+    document.getElementById("box").innerHTML = "No contact shared yet.";
+  }
+}
+
+load();
+</script>
+
+</body>
+</html>
