@@ -1,13 +1,17 @@
+import os
 import telebot
 from telebot import types
 from flask import Flask, render_template
 from threading import Thread
 
-TOKEN = "7487704262:AAE34XTNrKt5D9dKtduPK0Ezwc9j3SLGoBA"
-WEBAPP_URL = "https://testing-web-545.onrender.com/"   # Must be https
+# --- ENV VARIABLES (Render Dashboard) ---
+# BOT_TOKEN = your bot token
+TOKEN = os.getenv("7487704262:AAE34XTNrKt5D9dKtduPK0Ezwc9j3SLGoBA")
+
+WEBAPP_URL = "https://testing-web-545.onrender.com/"   # must be https
 
 bot = telebot.TeleBot(TOKEN)
-app = Flask(name)
+app = Flask(__name__)
 
 
 # /start command
@@ -55,9 +59,10 @@ def run_bot():
 
 
 def run_flask():
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))  # Render uses PORT env
+    app.run(host="0.0.0.0", port=port)
 
 
-if name == "main":
+if __name__ == "__main__":
     Thread(target=run_bot).start()
     Thread(target=run_flask).start()
