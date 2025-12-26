@@ -12,7 +12,7 @@
 
 <div id="box"
      style="border:1px solid #aaa;padding:10px;border-radius:10px;width:280px">
-  Waiting for contact…
+  Waiting for phone number…
 </div>
 
 <br>
@@ -28,26 +28,25 @@ tg.expand();
 const user = tg.initDataUnsafe?.user;
 const userId = user?.id;
 
-// fetch user info from backend
 async function loadData(){
   const res = await fetch(`/api/user/${userId}`);
   const data = await res.json();
 
   if(data.phone){
     document.getElementById("box").innerHTML = `
-      🆔 ID: ${userId}<br>
-      👤 Name: ${data.name}<br>
-      💬 Username: @${data.username || ""}<br>
-      🌐 Language: ${data.lang}<br>
-      📞 Phone: ${data.phone}
+      🆔 ${userId}<br>
+      👤 ${data.name}<br>
+      💬 @${data.username || ""}<br>
+      🌐 ${data.lang}<br>
+      📞 ${data.phone}
     `;
   }
 }
 
-document.getElementById("share").onclick = function(){
-  tg.requestContact((ok)=>{
+document.getElementById("share").onclick = () => {
+  tg.requestContact(ok => {
     if(ok){
-      setTimeout(loadData, 1500); // wait for bot to process
+      setTimeout(loadData, 1200);
     }
   });
 };
